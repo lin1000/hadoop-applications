@@ -40,7 +40,16 @@ public class NginxLogParser {
       logger.info("value="+value);
       String line = ((Text) value).toString();
       
-      String logEntryPattern = "^(\\S+) (\\S+) .*";
+      //10.XXX.XXX.XXX 
+      //10.XXX.XXX.OOO 
+      //- 
+      //[19/Sep/2017:04:51:31 -0500] 
+      //"GET /v1/API/abc HTTP/1.1"
+      //200 
+      //4428 "-" "Synapse-PT-HttpComponents-NIO" "-" 3.485 3.485
+      String logEntryPattern = "([^ ]*) ([^ ]*) ([^ ]*) \\[([^]]*)\\]"
+                                + " \"([^\"]*)\""
+                                + " ([^ ]*) ([^ ]*).*";
       Pattern p = Pattern.compile(logEntryPattern);
       Matcher matcher = p.matcher(value.toString());
       if (matcher.matches()) {
@@ -49,6 +58,11 @@ public class NginxLogParser {
           String t_ip = matcher.group(2);
           logger.info("s_ip="+s_ip);
           logger.info("t_ip="+t_ip);
+          logger.info("matcher.group(3)="+matcher.group(3));
+          logger.info("matcher.group(4)="+matcher.group(4));
+          logger.info("matcher.group(5)="+matcher.group(5));
+          logger.info("matcher.group(6)="+matcher.group(6));
+          logger.info("matcher.group(7)="+matcher.group(7));
           s_ip_text.set(s_ip);
           context.write(s_ip_text, one);
       }
